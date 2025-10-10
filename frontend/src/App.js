@@ -1,21 +1,28 @@
+
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./components/login";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import LoginPage from "./components/LoginPage";
+import SignUpPage from "./components/SignUpPage";
 import Dashboard from "./pages/Dashboard";
-import Upload from "./pages/Upload";
-import Reports from "./pages/Reports";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
+        {/* Redirect root to login */}
+        <Route path="/" element={<Navigate to="/login" />} />
+
+        {/* Pages */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/upload" element={<Upload />} />
-        <Route path="/reports" element={<Reports />} />
+
+        {/* Catch-all route for unknown paths */}
+        <Route path="*" element={<h2>Page not found</h2>} />
       </Routes>
     </Router>
   );
 }
 
 export default App;
+

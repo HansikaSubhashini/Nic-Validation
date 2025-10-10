@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Dashboard.css";
 import Navbar from "../components/Navbar";
 import { PieChart, Pie, Cell, Tooltip, BarChart, XAxis, YAxis, Bar, Legend } from "recharts";
@@ -18,6 +18,19 @@ const ageData = [
 const COLORS = ["#0088FE", "#FF8042"];
 
 const Dashboard = () => {
+  // redirect to login if not authenticated
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        // client side redirect
+        window.location.replace("/login");
+      }
+    } catch (e) {
+      // if accessing localStorage fails, also redirect to login
+      window.location.replace("/login");
+    }
+  }, []);
   // Example statistics
   const totalRecords = 160;
   const validRecords = 140;

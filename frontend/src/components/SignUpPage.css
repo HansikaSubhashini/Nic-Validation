@@ -1,0 +1,95 @@
+/* Background */
+.signup-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Form card */
+.signup-form {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 100, 255, 0.2);
+  width: 350px;
+  text-align: center;
+  animation: fadeIn 1s ease;
+}
+
+/* Title */
+.signup-form h2 {
+  color: #000;
+  margin-bottom: 25px;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+/* Inputs */
+.signup-form input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 18px;
+  border: 2px solid #007bff;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #000;
+  outline: none;
+  transition: 0.3s ease;
+}
+
+.signup-form input:focus {
+  border-color: #0056d2;
+  
+}
+
+/* Button */
+.signup-form button {
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.signup-form button:hover {
+  background-color: #0056d2;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 91, 255, 0.3);
+}
+
+/* Error & success text */
+.signup-form p {
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+/* Entry animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive for mobile */
+@media (max-width: 480px) {
+  .signup-form {
+    width: 85%;
+    padding: 25px;
+  }
+
+  .signup-form h2 {
+    font-size: 22px;
+  }
+}
