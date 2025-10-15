@@ -1,86 +1,86 @@
 // SignUpPage.js
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "./SignUpPage.css";
+import "./SignUpPage.css"; // Create this CSS file for styling
 
 function SignUpPage() {
-  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [signupError, setSignupError] = useState("");
-  const [signupSuccess, setSignupSuccess] = useState("");
-
-  // ✅ Backend API URL from .env
-  const apiUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:3500";
-  console.log("✅ Using API URL:", apiUrl);
+  const [message, setMessage] = useState("");
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    setSignupError("");
-    setSignupSuccess("");
+
+    if (!name || !email || !password) {
+      setMessage("All fields are required!");
+      return;
+    }
 
     try {
-      const res = await fetch(`${apiUrl}/signup`, {
+      const res = await fetch("http://localhost:3500/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
 
-      // Handle invalid JSON responses safely
-      let data;
-      try {
-        data = await res.json();
-      } catch {
-        throw new Error("Invalid response from server");
-      }
+      const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Sign Up failed");
+        setMessage(`❌ ${data.message}`);
+      } else {
+        setMessage(`✅ ${data.message}`);
+        setName("");
+        setEmail("");
+        setPassword("");
       }
-
-      setSignupSuccess("🎉 Account created successfully! Redirecting to login...");
-      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      console.error("❌ Sign Up failed:", err);
-      setSignupError(err.message || "Something went wrong. Please try again.");
+      console.error("Sign Up error:", err);
+      setMessage("❌ Network error. Please try again.");
     }
   };
 
   return (
-    <div className="signup-container">
-      <form className="signup-form" onSubmit={handleSignUp}>
+    <div className="signup-page">
+      <div className="signup-card">
         <h2>Create Account</h2>
+        {message && <p className="message">{message}</p>}
+        <form onSubmit={handleSignUp} className="signup-form">
+          <div className="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
 
-        <input
-          type="text"
-          placeholder="Enter your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        <input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        <input
-          type="password"
-          placeholder="Enter your password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-
-        <button type="submit">Sign Up</button>
-
-        {signupError && <p style={{ color: "red", marginTop: 8 }}>{signupError}</p>}
-        {signupSuccess && <p style={{ color: "green", marginTop: 8 }}>{signupSuccess}</p>}
-      </form>
+          <button type="submit" className="signup-btn">Sign Up</button>
+        </form>
+      </div>
     </div>
   );
 }

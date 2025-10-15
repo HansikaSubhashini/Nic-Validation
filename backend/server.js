@@ -2,8 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
 const dotenv = require("dotenv");
-const jwt = require("jsonwebtoken"); // ✅ You forgot this import earlier
-const multer = require("multer"); 
+const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
 
 // Load environment variables
 dotenv.config();
@@ -11,7 +12,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3500;
 
-// ✅ CORS fix — more complete
+// ✅ CORS configuration
 app.use(
   cors({
     origin: "http://localhost:3000", // React app’s URL
@@ -24,7 +25,10 @@ app.use(
 // Middleware
 app.use(express.json());
 
-// MySQL connection
+// ✅ Serve uploaded files statically (optional but useful)
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// ✅ MySQL connection
 const connection = mysql.createConnection({
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
@@ -40,12 +44,14 @@ connection.connect((err) => {
   }
 });
 
-// Example route
+// ======================= ROUTES =======================
+
+// ✅ Root route
 app.get("/", (req, res) => {
   res.send("NIC Validation Backend Running 🚀");
 });
 
-// ======================= SIGNUP ROUTE =======================
+// ✅ Signup route
 app.post("/signup", (req, res) => {
   const { name, email, password } = req.body;
 
@@ -66,7 +72,7 @@ app.post("/signup", (req, res) => {
   );
 });
 
-// ======================= LOGIN ROUTE =======================
+// ✅ Login route
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -89,15 +95,13 @@ app.post("/login", (req, res) => {
 
       const user = results[0];
 
-      // ✅ Generate JWT token
       const token = jwt.sign(
         { id: user.id, email: user.email },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" } // token expires in 1 hour
+        process.env.JWT_SECRET || "secret123",
+        { expiresIn: "1h" }
       );
 
-      // ✅ Return token and user info
-      return res.status(200).json({
+      res.status(200).json({
         message: "Login successful",
         token,
         user,
@@ -105,26 +109,34 @@ app.post("/login", (req, res) => {
     }
   );
 });
-// ======================= FILE UPLOAD ROUTE =======================
 
-const upload = multer({ dest: "uploads/" });
+//File Upload 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
 
 app.post(
   "/upload",
   upload.fields([
-    { name: "file1" },
-    { name: "file2" },
-    { name: "file3" },
-    { name: "file4" },
+    { name: "file1", maxCount: 1 },
+    { name: "file2", maxCount: 1 },
+    { name: "file3", maxCount: 1 },
+    { name: "file4", maxCount: 1 },
   ]),
   (req, res) => {
-    if (!req.files) {
+    console.log("✅ Uploaded files:", req.files);
+
+    if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).json({ message: "No files uploaded" });
     }
 
-    console.log("Uploaded files:", req.files);
-
-    // ✅ Send proper JSON response with files info
     res.json({
       message: "Files uploaded successfully",
       files: req.files,
@@ -132,9 +144,7 @@ app.post(
   }
 );
 
-
-// Start server
+// ✅ Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
- 
