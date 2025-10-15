@@ -1,8 +1,12 @@
-import React, { useEffect } from "react";
-import "./Dashboard.css";
-import Navbar from "../components/Navbar";
-import { PieChart, Pie, Cell, Tooltip, BarChart, XAxis, YAxis, Bar, Legend } from "recharts";
+// Dashboard.js
 
+import React from "react";
+import "./Dashboard.css";
+// 1. IMPORT THE NAVBAR COMPONENT AT THE TOP
+import Navbar from "../components/Navbar"; // <-- ADD THIS LINE (Adjust path if needed)
+import { PieChart, Pie, Cell, Tooltip, Legend, BarChart, XAxis, YAxis, Bar, ResponsiveContainer } from "recharts";
+
+// ... (your genderData and ageData constants remain the same)
 const genderData = [
   { name: "Male", value: 60 },
   { name: "Female", value: 40 },
@@ -17,88 +21,70 @@ const ageData = [
 
 const COLORS = ["#0088FE", "#FF8042"];
 
-const Dashboard = () => {
-  // redirect to login if not authenticated
-  useEffect(() => {
-    try {
-      const token = localStorage.getItem("authToken");
-      if (!token) {
-        // client side redirect
-        window.location.replace("/login");
-      }
-    } catch (e) {
-      // if accessing localStorage fails, also redirect to login
-      window.location.replace("/login");
-    }
-  }, []);
-  // Example statistics
-  const totalRecords = 160;
-  const validRecords = 140;
-  const invalidRecords = 20;
-  const filesUploaded = 4;
 
+function Dashboard() {
   return (
-    <div>
-      <Navbar />
-      <div className="dashboard-container">
-        <h1>Dashboard</h1>
+    // Use a React Fragment <> to wrap both elements
+    <>
+      {/* 2. ADD THE NAVBAR COMPONENT HERE, BEFORE THE DASHBOARD CONTENT */}
+      <Navbar /> 
 
-        {/* Cards */}
-        <div className="cards">
-          <div className="card">
-            <h3>Total Records</h3>
-            <p>{totalRecords}</p>
-          </div>
-          <div className="card">
-            <h3>Valid Records</h3>
-            <p>{validRecords}</p>
-          </div>
-          <div className="card">
-            <h3>Invalid Records</h3>
-            <p>{invalidRecords}</p>
-          </div>
-          <div className="card">
-            <h3>Files Uploaded</h3>
-            <p>{filesUploaded}</p>
-          </div>
+      <div className="dashboard-container">
+        {/* Cards Section */}
+        <div className="card-container">
+            {/*... your cards ...*/}
+            <div className="card">
+                <h3>Total Records</h3>
+                <p>120</p>
+            </div>
+            <div className="card">
+                <h3>Valid Records</h3>
+                <p>95</p>
+            </div>
+            <div className="card">
+                <h3>Invalid Records</h3>
+                <p>25</p>
+            </div>
+            <div className="card">
+                <h3>Files Uploaded</h3>
+                <p>8</p>
+            </div>
         </div>
 
-        {/* Charts */}
-        <div className="charts">
-          <div className="chart">
+        {/* Charts Section */}
+        <div className="charts-container">
+          {/* ... your charts ... */}
+          <div className="chart-section">
             <h3>Gender Distribution</h3>
-            <PieChart width={300} height={300}>
-              <Pie
-                data={genderData}
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-                label
-              >
-                {genderData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie data={genderData} dataKey="value" outerRadius={100} label>
+                  {genderData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
           </div>
 
-          <div className="chart">
+          <div className="chart-section">
             <h3>Age Distribution</h3>
-            <BarChart width={400} height={300} data={ageData}>
-              <XAxis dataKey="age" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="count" fill="#82ca9d" />
-            </BarChart>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={ageData}>
+                <XAxis dataKey="age" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="count" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
-};
+}
 
 export default Dashboard;

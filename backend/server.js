@@ -1,102 +1,140 @@
-// server.js
 const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
-const bcrypt = require("bcrypt"); // for password hashing
-require("dotenv").config();
+const dotenv = require("dotenv");
+const jwt = require("jsonwebtoken"); // ✅ You forgot this import earlier
+const multer = require("multer"); 
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3500;
 
+// ✅ CORS fix — more complete
+app.use(
+  cors({
+    origin: "http://localhost:3000", // React app’s URL
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
 // Middleware
-app.use(cors());
 app.use(express.json());
 
 // MySQL connection
 const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT || 3306
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "node_app_db",
 });
 
-// Connect to MySQL
-connection.connect(err => {
-  if (err) throw err;
-  console.log("✅ Connected to MySQL database");
+connection.connect((err) => {
+  if (err) {
+    console.error("❌ Database connection failed:", err);
+  } else {
+    console.log("✅ Connected to MySQL database");
+  }
 });
 
-// Signup route
-app.post("/signup", async (req, res) => {
+// Example route
+app.get("/", (req, res) => {
+  res.send("NIC Validation Backend Running 🚀");
+});
+
+// ======================= SIGNUP ROUTE =======================
+app.post("/signup", (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
-  // Check if email exists
   connection.query(
-    "SELECT * FROM users WHERE email = ?",
-    [email],
-    async (err, results) => {
-      if (err) return res.status(500).json({ message: err.message });
-
-      if (results.length > 0) {
-        return res.status(400).json({ message: "Email already registered" });
+    "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+    [name, email, password],
+    (err) => {
+      if (err) {
+        console.error("❌ Signup error:", err);
+        return res.status(500).json({ message: "Database error" });
       }
-
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Insert user
-      connection.query(
-        "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-        [name, email, hashedPassword],
-        (err, results) => {
-          if (err) return res.status(500).json({ message: err.message });
-
-          res.json({ message: "User registered successfully!" });
-        }
-      );
+      res.status(201).json({ message: "User signed up successfully!" });
     }
   );
 });
 
-// Login route
+// ======================= LOGIN ROUTE =======================
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
-  console.log("Login attempt with email:", email); // log the email
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
 
   connection.query(
-    "SELECT * FROM users WHERE email = ?",
-    [email],
-    async (err, results) => {
+    "SELECT * FROM users WHERE email = ? AND password = ?",
+    [email, password],
+    (err, results) => {
       if (err) {
-        console.log("Database error:", err); // log database errors
-        return res.status(500).json({ message: err.message });
+        console.error("❌ Login error:", err);
+        return res.status(500).json({ message: "Database error" });
       }
 
       if (results.length === 0) {
-        console.log("No user found with this email"); // log if user not found
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
       const user = results[0];
-      const passwordMatch = await bcrypt.compare(password, user.password);
-      console.log("Password match:", passwordMatch); // log password comparison result
 
-      if (!passwordMatch) {
-        console.log("Password incorrect"); // log incorrect password
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
+      // ✅ Generate JWT token
+      const token = jwt.sign(
+        { id: user.id, email: user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" } // token expires in 1 hour
+      );
 
-      console.log("Login successful for user:", email); // log successful login
-      res.json({ message: "Login successful", token: "mock-jwt-token-1234" });
+      // ✅ Return token and user info
+      return res.status(200).json({
+        message: "Login successful",
+        token,
+        user,
+      });
     }
   );
 });
+// ======================= FILE UPLOAD ROUTE =======================
+
+const upload = multer({ dest: "uploads/" });
+
+app.post(
+  "/upload",
+  upload.fields([
+    { name: "file1" },
+    { name: "file2" },
+    { name: "file3" },
+    { name: "file4" },
+  ]),
+  (req, res) => {
+    if (!req.files) {
+      return res.status(400).json({ message: "No files uploaded" });
+    }
+
+    console.log("Uploaded files:", req.files);
+
+    // ✅ Send proper JSON response with files info
+    res.json({
+      message: "Files uploaded successfully",
+      files: req.files,
+    });
+  }
+);
 
 
 // Start server
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
+ 

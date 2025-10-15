@@ -11,9 +11,9 @@ function SignUpPage() {
   const [signupError, setSignupError] = useState("");
   const [signupSuccess, setSignupSuccess] = useState("");
 
-  // ✅ API URL from .env
-  const apiUrl = process.env.REACT_APP_BACKEND_URL;
-  console.log("API URL:", apiUrl); // <-- check if this is defined correctly
+  // ✅ Backend API URL from .env
+  const apiUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:3500";
+  console.log("✅ Using API URL:", apiUrl);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -27,17 +27,23 @@ function SignUpPage() {
         body: JSON.stringify({ name, email, password }),
       });
 
-      const data = await res.json();
+      // Handle invalid JSON responses safely
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error("Invalid response from server");
+      }
 
       if (!res.ok) {
         throw new Error(data.message || "Sign Up failed");
       }
 
-      setSignupSuccess("Account created successfully! Redirecting to login...");
-      setTimeout(() => navigate("/login"), 2000); // Redirect after 2 seconds
+      setSignupSuccess("🎉 Account created successfully! Redirecting to login...");
+      setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      console.error("Sign Up failed:", err);
-      setSignupError(err.message);
+      console.error("❌ Sign Up failed:", err);
+      setSignupError(err.message || "Something went wrong. Please try again.");
     }
   };
 
@@ -53,6 +59,7 @@ function SignUpPage() {
           onChange={(e) => setName(e.target.value)}
           required
         />
+
         <input
           type="email"
           placeholder="Enter your email"
@@ -60,6 +67,7 @@ function SignUpPage() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
+
         <input
           type="password"
           placeholder="Enter your password"
