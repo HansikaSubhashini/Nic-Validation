@@ -1,16 +1,9 @@
 /* Dashboard.css */
 
 .dashboard-container {
-  margin-top: 80px; /* space for fixed navbar */
-  padding: 20px;
-}
-
-/* Overall container for the dashboard content */
-.dashboard-container {
-  margin-top: 250px;
+  margin-top: 0; /* spacing is handled by MainLayout */
   padding: 25px;
-  /* background-color: #f0f2f5; A light grey background is common for dashboards */
-  min-height: 100vh;
+  min-height: 100%;
 }
 
 /* Container for the top cards */

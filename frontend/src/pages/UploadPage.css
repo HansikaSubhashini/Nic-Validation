@@ -8,7 +8,7 @@
 
 /* Main Card */
 .upload-main-card {
-  margin-top: 150px;
+  margin-top: 0;
   background: #ffffff;
   border-radius: 16px;
   padding: 30px 25px;
@@ -176,23 +176,7 @@
   max-height: 80vh; /* ✅ prevents overflow off screen */
 }
 }
-/* Make Navbar fixed */
-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-}
-
-/* Content under navbar */
-.main-content {
-  padding-top: 80px; /* Adjust according to your navbar height */
-  padding-left: 20px;
-  padding-right: 20px;
-  min-height: 100vh;
-  background-color: #f8f9fa;
-}
+/* NOTE: navbar is handled globally in Navbar.css and layout spacing is handled by MainLayout.css */
 
 /* Table container scrollable */
 .table-container {

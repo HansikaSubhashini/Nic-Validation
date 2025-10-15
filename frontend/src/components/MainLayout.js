@@ -1,14 +1,17 @@
 import React from "react";
 import Navbar from "./Navbar";
-import "../pages/UploadPage.css"; // reuse your styles
+import Footer from "./Footer";
+import "./MainLayout.css";
 
 function MainLayout({ children }) {
   return (
     <div className="main-layout">
       <Navbar />
-      <div className="main-content">
-        {children}
-      </div>
+
+      {/* Middle content area - only this area scrolls */}
+      <div className="main-content">{children}</div>
+
+      <Footer />
     </div>
   );
 }

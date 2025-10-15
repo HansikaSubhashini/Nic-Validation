@@ -1,0 +1,10 @@
+.app-footer {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.footer-inner{
+  max-width: 1100px;
+  width: 100%;
+  padding: 0 16px;
+}

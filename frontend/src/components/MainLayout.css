@@ -1,0 +1,57 @@
+/* Main layout: fixed header and footer, scrollable middle content */
+
+:root{
+  --navbar-height: 60px;
+  --footer-height: 48px;
+}
+
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* full viewport height */
+  overflow: hidden; /* prevent body scroll */
+}
+
+/* main-content sits between header and footer and scrolls internally */
+.main-content {
+  flex: 1 1 auto;
+  margin-top: var(--navbar-height); /* ensure content starts below navbar when navbar is fixed */
+  margin-bottom: var(--footer-height);
+  overflow: auto; /* this area scrolls */
+  background: #f8f9fa;
+  padding: 20px 24px;
+}
+
+/* Small utility to center empty state */
+.main-content .empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6c757d;
+}
+
+/* Footer sits fixed to bottom of layout container */
+.app-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--footer-height);
+  background: #ffffff;
+  border-top: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Make sure forms/tables inside main-content don't stretch behind header */
+.main-content > * {
+  min-height: 20px;
+}
+
+@media (max-width: 768px) {
+  :root{ --navbar-height: 80px; }
+  .main-content { padding: 12px; }
+}
